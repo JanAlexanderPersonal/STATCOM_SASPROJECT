@@ -10,11 +10,22 @@ Thiebe Sleeuwaert
 ***********************************************;
 
 * Set libname (Proj);
-libname HW '/folders/myfolders/Project/STATCOM_SASPROJECT';
+libname Proj '/folders/myfolders/Project/STATCOM_SASPROJECT';
 
 
 *    1. Import the 3 data sets.;
-    
+%macro loadcsv(csvname, dataname);
+      	PROC IMPORT DATAFILE=&csvname
+		    OUT=WORK.&dataname
+		    DBMS=CSV
+		    REPLACE;
+		RUN;
+%mend loadcsv;
+
+FILENAME CSV "/folders/myfolders/Project/STATCOM_SASPROJECT/pollution_us_2000_2016.csv" TERMSTR=LF;
+%loadcsv(csv, poll2);
+
+
 
 *    2. Using the climate data, calculate the mean temperature value in each state and month and output the results. ;
 *    3. Starting from the output data from question 2, use an array statement to obtain the average monthly temperature 
