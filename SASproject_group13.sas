@@ -22,12 +22,16 @@ libname Proj '/folders/myfolders/Project/STATCOM_SASPROJECT';
 		RUN;
 %mend loadcsv;
 
-FILENAME CSV "/folders/myfolders/Project/STATCOM_SASPROJECT/pollution_us_2000_2016.csv" TERMSTR=LF;
-%loadcsv(csv, poll2);
-
-
+FILENAME CSV1 "/folders/myfolders/Project/STATCOM_SASPROJECT/pollution_us_2000_2016.csv" TERMSTR=LF;
+FILENAME CSV2 "/folders/myfolders/Project/STATCOM_SASPROJECT/avg_max_temp.csv" TERMSTR=LF;
+FILENAME CSV3 "/folders/myfolders/Project/STATCOM_SASPROJECT/us-state-ansi-fips.csv" TERMSTR=LF;
+%loadcsv(csv1, pollution);
+%loadcsv(csv2, climate);
+%loadcsv(csv3, USstates);
 
 *    2. Using the climate data, calculate the mean temperature value in each state and month and output the results. ;
+
+
 *    3. Starting from the output data from question 2, use an array statement to obtain the average monthly temperature 
 		data from each state in a long format.;
 
