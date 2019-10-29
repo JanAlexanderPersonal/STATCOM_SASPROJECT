@@ -44,6 +44,26 @@ run;
 
 *    3. Starting from the output data from question 2, use an array statement to obtain the average monthly temperature 
 		data from each state in a long format.;
+		
+* assignment is to transpose the dataset with array statements. I cannot get this to work.
+
+*data transp;
+*	set work.meanTemp end=last;
+*	array monthtemp[12] JAN_Mean - DEC_Mean;
+*	array all[53, 12] _temporary_;
+*	array statetemp[53] ;
+*	i + 1;
+*	do j = 1 to dim(work.meanTemp);
+*		all[i,j] = monthtemp[j];
+*	end;
+*	if last then do;
+*		do j = 1 to dim(monthtemp);
+*			do i = 1 to 53;
+*				statetemp[i] = all[j,i]
+*			end;
+*		end;
+*	end;
+*run;
 
 
 *    4. Merge the data table obtained in Question 3 with the FIPS code data set using stsups as by variable and outputting 
