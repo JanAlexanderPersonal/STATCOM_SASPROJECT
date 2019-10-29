@@ -29,11 +29,22 @@ FILENAME CSV3 "/folders/myfolders/Project/STATCOM_SASPROJECT/us-state-ansi-fips.
 %loadcsv(csv2, climate);
 %loadcsv(csv3, USstates);
 
-*    2. Using the climate data, calculate the mean temperature value in each state and month and output the results. ;
+* print a few lines of each data set: ;
+proc print data=work.pollution (obs=5); run;
+proc print data=work.climate (obs=5); run;
+proc print data=work.USstates (obs=5); run;
 
+*    2. Using the climate data, calculate the mean temperature value in each state and month and output the results. ;
+proc means data=work.climate nway noprint;
+	output out = work.meanTemp 
+	(drop=_type_ _freq_ YRS_mean)
+	mean= / autoname;
+	class state_postal_abbr;
+run;
 
 *    3. Starting from the output data from question 2, use an array statement to obtain the average monthly temperature 
 		data from each state in a long format.;
+
 
 *    4. Merge the data table obtained in Question 3 with the FIPS code data set using stsups as by variable and outputting 
 		only matching rows.;
