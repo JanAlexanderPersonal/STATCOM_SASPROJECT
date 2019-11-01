@@ -10,7 +10,7 @@ Thiebe Sleeuwaert
 ***********************************************;
 
 * Set libname (Proj);
-libname Proj '/folders/myfolders/Project/STATCOM_SASPROJECT';
+libname Proj 'H:/SAS/HW/';
 
 
 *    1. Import the 3 data sets.;
@@ -22,9 +22,9 @@ libname Proj '/folders/myfolders/Project/STATCOM_SASPROJECT';
 		RUN;
 %mend loadcsv;
 
-FILENAME CSV1 "/folders/myfolders/Project/STATCOM_SASPROJECT/pollution_us_2000_2016.csv" TERMSTR=LF;
-FILENAME CSV2 "/folders/myfolders/Project/STATCOM_SASPROJECT/avg_max_temp.csv" TERMSTR=LF;
-FILENAME CSV3 "/folders/myfolders/Project/STATCOM_SASPROJECT/us-state-ansi-fips.csv" TERMSTR=LF;
+FILENAME CSV1 "H:/SAS/HW/pollution_us_2000_2016.csv" TERMSTR=LF;
+FILENAME CSV2 "H:/SAS/HW/avg_max_temp.csv" TERMSTR=LF;
+FILENAME CSV3 "H:/SAS/HW/us-state-ansi-fips.csv" TERMSTR=LF;
 %loadcsv(csv1, pollution);
 %loadcsv(csv2, climate);
 %loadcsv(csv3, USstates);
@@ -42,32 +42,40 @@ proc means data=work.climate nway noprint;
 	class state_postal_abbr;
 run;
 
+proc print data=work.meanTemp (obs=5); run;
+
 *    3. Starting from the output data from question 2, use an array statement to obtain the average monthly temperature 
 		data from each state in a long format.;
 		
-* assignment is to transpose the dataset with array statements. I cannot get this to work.
+data work.meanTempLong(keep = state_postal_abbr month mean);
+	set work.meanTemp;
+	array m{12} JAN_mean --  DEC_mean;
+	do month = 1 to 12;
+		mean = m{month};
+		output;
+	end;
+run;
 
-*data transp;
-*	set work.meanTemp end=last;
-*	array monthtemp[12] JAN_Mean - DEC_Mean;
-*	array all[53, 12] _temporary_;
-*	array statetemp[53] ;
-*	i + 1;
-*	do j = 1 to dim(work.meanTemp);
-*		all[i,j] = monthtemp[j];
-*	end;
-*	if last then do;
-*		do j = 1 to dim(monthtemp);
-*			do i = 1 to 53;
-*				statetemp[i] = all[j,i]
-*			end;
-*		end;
-*	end;
-*run;
-
+proc print data=work.meanTempLong (obs=5); run;
 
 *    4. Merge the data table obtained in Question 3 with the FIPS code data set using stsups as by variable and outputting 
 		only matching rows.;
+
+proc sort data = work.USstates out = work.USstates;
+	by stusps;
+run;
+
+proc sort data = work.meanTempLong out = work.meanTempLong;
+	by state_postal_abbr month;
+run;
+
+data work.statesTemp;
+	merge work.meanTempLong(rename = (state_postal_abbr = stusps) in = inTemp) work.USstates(in = inState);
+	by stusps;
+	if inTemp = 1 and inState = 1;
+run;
+
+proc print data=work.statesTemp (obs=5); run;
 		
 *    5. Merge the data table obtained in Question 4 with the pollution data. Hint: you’ll have to create a month variable 
 		in the pollution data set first and then perform a merge by state and month. Output only matching rows. ;
