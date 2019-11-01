@@ -79,10 +79,50 @@ proc print data=work.statesTemp (obs=5); run;
 		
 *    5. Merge the data table obtained in Question 4 with the pollution data. Hint: you’ll have to create a month variable 
 		in the pollution data set first and then perform a merge by state and month. Output only matching rows. ;
+
+data work.pollutionM;
+	set work.pollution;
+	month = month(Date_Local);
+run;
+
+proc sort data = work.pollutionM out = work.pollutionM;
+	by State month;
+run;
+
+proc sort data = work.statesTemp out = work.statesTemp;
+	by stname month;
+run;
+
+data work.pollutionTemp;
+	merge work.pollutionM(in = inPoll) work.statesTemp(rename = (stname = State) in = inTemp);
+	by State month;
+	if inPoll = 1 and inTemp = 1;
+run;
+
+proc print data=work.pollutionTemp (obs=15); run;
 		
 *    6. Use an appropiate procedure for comparing the number of levels of county_code and county. What do you observe? 
 		Write down your findings. Remedy the problem by creating a unique county code by concatenating state_code and
 		county_code separated by an underscore. Search for a SAS function that can do this. ;
+
+*There's a different number of county codes and countys;
+proc freq data = work.pollutionTemp nlevels;
+	tables County County_Code / noprint;
+run;
+
+*However, state by state, the number is the same. The conclusion is that different states use the same county codes.
+proc freq data = work.pollutionTemp nlevels;
+	tables County County_Code / noprint;
+	by State;
+run;
+
+data work.pollutionTemp;
+	set work.pollutionTemp;
+	county_id = catx('_', State_Code, County_Code);
+run;
+ 
+proc print data=work.pollutionTemp (obs=15); run;
+
 *    7. Using the data set obtained from question 6, create a permanent data set keeping all observations from the state 
 		PA and the variables
         ◦ County
@@ -96,7 +136,14 @@ proc print data=work.statesTemp (obs=5); run;
         ◦ O3_mean
         ◦ O3_AQI
         ◦ Temperature variable from question 3;
-        
+
+data Proj.pollutionTemp(keep = County County_code State stusps st Date_Local month O3_Units O3_mean O3_AQI mean);
+	set work.pollutionTemp;
+	where stusps = 'PA';
+run;
+
+proc print data=Proj.pollutionTemp (obs=15); run;
+
 *    8. Calculate average values of O3_mean and O3_AQI for each county and month and include the table in your report. 
 		Use the tabulate procedure. Make use of the Date_local variable in combination with an appropiate format. 
 		Report 3 decimals. Discuss.;
