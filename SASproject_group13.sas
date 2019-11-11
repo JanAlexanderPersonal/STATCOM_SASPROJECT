@@ -10,7 +10,8 @@ Thiebe Sleeuwaert
 ***********************************************;
 
 * Set libname (Proj);
-libname Proj 'H:/SAS/HW/';
+* libname Proj 'H:/SAS/HW/';  * Ondrej folder;
+libname Proj '/folders/myfolders/Project/STATCOM_SASPROJECT/'; *Jan folder;
 
 
 *    1. Import the 3 data sets.;
@@ -22,9 +23,9 @@ libname Proj 'H:/SAS/HW/';
 		RUN;
 %mend loadcsv;
 
-FILENAME CSV1 "H:/SAS/HW/pollution_us_2000_2016.csv" TERMSTR=LF;
-FILENAME CSV2 "H:/SAS/HW/avg_max_temp.csv" TERMSTR=LF;
-FILENAME CSV3 "H:/SAS/HW/us-state-ansi-fips.csv" TERMSTR=LF;
+FILENAME CSV1 "/folders/myfolders/Project/STATCOM_SASPROJECT/pollution_us_2000_2016.csv" TERMSTR=LF;
+FILENAME CSV2 "/folders/myfolders/Project/STATCOM_SASPROJECT/avg_max_temp.csv" TERMSTR=LF;
+FILENAME CSV3 "/folders/myfolders/Project/STATCOM_SASPROJECT/us-state-ansi-fips.csv" TERMSTR=LF;
 %loadcsv(csv1, pollution);
 %loadcsv(csv2, climate);
 %loadcsv(csv3, USstates);
@@ -96,6 +97,7 @@ run;
 data work.pollutionTemp;
 	merge work.pollutionM(in = inPoll) work.statesTemp(rename = (stname = State) in = inTemp);
 	by State month;
+	drop VAR1;
 	if inPoll = 1 and inTemp = 1;
 run;
 
@@ -105,7 +107,7 @@ proc print data=work.pollutionTemp (obs=15); run;
 		Write down your findings. Remedy the problem by creating a unique county code by concatenating state_code and
 		county_code separated by an underscore. Search for a SAS function that can do this. ;
 
-*There's a different number of county codes and countys;
+*There is a different number of county codes and countys;
 proc freq data = work.pollutionTemp nlevels;
 	tables County County_Code / noprint;
 run;
@@ -147,9 +149,36 @@ proc print data=Proj.pollutionTemp (obs=15); run;
 *    8. Calculate average values of O3_mean and O3_AQI for each county and month and include the table in your report. 
 		Use the tabulate procedure. Make use of the Date_local variable in combination with an appropiate format. 
 		Report 3 decimals. Discuss.;
+		
+		** Date_local is not in this dataframe anymore?;
+		** formatting is not ok;
+		** missing month values (see Dauphin);
+		
+
+proc means data=Proj.pollutionTemp mean nway;
+	output out = work.MeansO3;
+	var O3_mean O3_AQI;
+	class County month;
+run;
+
+title 'Monthly O3 data for each county';
+proc tabulate data=work.MEANSO3;
+	class county month;
+	var O3_mean O3_AQI;
+	table county*month, O3_mean*mean O3_AQI*mean;
+	format 	O3_mean 8.4
+			O3_AQI 8.4;
+run;
+title;
+		
 *    9. Plot the average concentration of O3 in different counties, using barplots, in descending order. Use appropiate 
 		axis titles. In case you are trying the unicodes for subscripts, use labelattrs=(family='Times New Roman') 
 		since the unicode will not work for the standard font. Include the graph in your report and discuss.;
+
+proc sgplot data=work.meansO3;
+	vbar County / stat=mean response=O3_mean
+	categoryorder=respdesc;
+run;
 		
 *    10. Calculate the yearly average of the ozone concentration for each county and output these values to a SAS data set. 
 		Hint: Use an appropiate format statement to achieve this. Using this outputted data set, use the HEATMAPPARM statement 
@@ -157,6 +186,7 @@ proc print data=Proj.pollutionTemp (obs=15); run;
 		ozone concentration as response. You might want to have a look at the SAS blog from Rick Wicklin 
 		https://blogs.sas.com/content/iml/2019/07/15/create-discrete-heat-map-sgplot.html. 
 		Include the heatmap in your report and discuss.;
+
 		
 		
 *    11. Using again the data set created in question 7, draw a lineplot that displays O3_AQI over the years for the 
