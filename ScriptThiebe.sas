@@ -96,7 +96,7 @@ proc print data=work.statesTemp (obs=5)noobs;
 			month mnthfmt.;
 run;
 
-*    5. Merge the data table obtained in Question 4 with the pollution data. Hint: you’ll have to create a month variable 
+*    5. Merge the data table obtained in Question 4 with the pollution data. Hint: youâ€™ll have to create a month variable 
 in the pollution data set first and then perform a merge by state and month. Output only matching rows. ;
 data work.pollutionM;
 	set work.pollution;
@@ -306,8 +306,8 @@ run;
 title;
 
 *    13. Write a pdf report with the ODS system of max 5 pages containing the following:
-    • Names of the group members with a mentioning of who did what.
-    • A short introduction on the topic.
-    • Answers to the questions with requested plots and tables inserted.
-    • The name of the report should be as follows: SASproject_groupX.pdf. The code should be sent as a separate file 
+    â€¢ Names of the group members with a mentioning of who did what.
+    â€¢ A short introduction on the topic.
+    â€¢ Answers to the questions with requested plots and tables inserted.
+    â€¢ The name of the report should be as follows: SASproject_groupX.pdf. The code should be sent as a separate file 
      named SASproject_groupX.sas. This code is expected to be between 300 and 400 lines.;
