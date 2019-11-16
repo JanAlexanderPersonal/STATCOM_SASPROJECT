@@ -1,0 +1,11 @@
+16/11/2019
+
+Changes between Script Thiebe en Script Jan:
+
+1 - Var path to avoid too many changes in document
+
+2 - Load CSV1: What does 'Name is not a valid SAS name' ?
+
+3 - For Q6: made list of counties with double or tripple county_id
+
+4 - Heatmap: X-axis is sorted and three options for the color scheme can be compared one to the other.
