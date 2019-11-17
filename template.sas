@@ -19,8 +19,37 @@ options papersize=a4 orientation = portrait
 ods pdf file = "&path.SASproject_group13.pdf" startpage =never style=sasweb; /* startpage = never plots everyrhing on one page */ 
 ods graphics / reset=all width=30cm height=20cm ; /* settings for graph, i hope to find something similar for the table Q8*/
 /* introduction */
-title 'Introduction';
 proc odstext;
+
+p 'Project Statistic computation' /
+ style = [color=black fontsize=18pt];
+ 
+p 'Group 13' /
+ style = [color=grey fontsize=16pt]; 
+ 
+run;
+
+data work.team;
+	input Surname $ Name $ Contribution;
+	datalines;
+	Alexander Jan 0.25
+	Sleeuwaert Thiebe 0.25
+	Platjouw Emiel 0.25
+	Skacel Ondrej 0.25
+	;
+run;
+
+
+proc print data= work.team;
+	format 	Surname $12.
+			Name $7.
+			Contribution percent8.0;
+run;
+
+ods proclabel 'Introduction';
+proc odstext;
+p 'Introduction' /
+ style = [color=grey fontsize=14pt just=c]; 
 
 p 'Ever since the industrialization of the world and the enormous increase in the global human population it brought with it,
  pollution has increasingly become a problem. The rising industrial and energy production relied on the burning
@@ -50,6 +79,8 @@ p 'Ground-level ozone, not to be confused with atmospheric ozone, and airborne p
  In this project we focus on the ozone levels in the state of Pennsylvania (PA) in the US between the years 2000 and 2016.'/
  style = [color=black fontsize=11pt];
 run;
+
+
 proc odstext;
 p 'Sources:' /  style = [color=black fontsize=11pt];
 list ;
@@ -81,14 +112,24 @@ FILENAME csv3 "&path.us-state-ansi-fips.csv" TERMSTR=LF;
 %loadcsv(csv3, USstates);
 
 proc odstext;
+p 'Data sources' /
+ style = [color=grey fontsize=14pt]; 
+ 
 p 'The pollution data was obtained from https://www.kaggle.com/ksaulakh/r-analysis-pollution-data, 
  the climate data downloaded from https://www.ncdc.noaa.gov/ghcn/comparative-climatic-data and
  the data file us-state-ansi-fips.csv, further referred to as USstates, has provided the state names, 
  state name FIPS codes (st) and postal abbreviations (stusps).' /  style = [color=black fontsize=12pt];
 run;
 
+
+
 proc odstext;
-p 'Using the climate data, the mean temperature in each month was computed for every state. The results for the (alphabetically) first 5 states are shown in the following table.';
+p 'Climate data analysis' /
+ style = [color=grey fontsize=14pt]; 
+ 
+p 'Using the climate data, the mean temperature in each month was computed for every state. 
+The results for the (alphabetically) first 5 states are shown in the following table.' /  
+style = [color=black fontsize=12pt];
 run;
 
 *    2. Using the climate data, calculate the mean temperature value in each state and month and output the results. ;
@@ -96,8 +137,10 @@ title 'Average temperature per month in each state';
 proc means data=work.climate nway noprint;
 	var JAN -- DEC;
 	class state_postal_abbr;
-	output out = work.meanTemp (drop=_type_ _freq_ ) mean= / autoname;
+	output out = work.meanTemp (drop=_type_ _freq_ ) mean= / 
+	autoname;
 run;
+
 proc print data=work.meanTemp (obs=5) noobs;
 	format JAN_mean --  DEC_mean 6.2;
 run;
@@ -265,13 +308,18 @@ run;
 		Report 3 decimals. Discuss.;
 	** Version with tabulate, proper format and use of Date_Local and the saved pollutionTemp data ;
 	** Missing months still present but just not there in the original data maybe?;
+
+	
+	
 title 'Monthly averages of O3 data for each county';
-proc tabulate data=Proj.pollutionTemp format = 8.3 out = work.meansO3;
+proc tabulate data=Proj.pollutionTemp format = 8.3 out = work.meansO3 ;
 	class County Date_Local;
 	var O3_Mean O3_AQI;
-	table County, Date_Local*(O3_Mean*mean O3_AQI*mean);
+	*table County, Date_Local*(O3_Mean*mean O3_AQI*mean);
+	table County, Date_Local*(O3_Mean=' ')*(mean=' ') / rts=25 row=float box="O3_mean";
+	table County, Date_Local*(O3_AQI=' ')*(mean=' ') / rts=25 row=float box="O3_AQI";
 	label Date_Local = 'Month';
-	format Date_Local MONTH12.; /* ideally we should be able to get this as.character (JAN, FEB, ...) */
+	format Date_Local MONNAME3.; /* ideally we should be able to get this as.character (JAN, FEB, ...) - done, Jan*/
 run;
 title;
 
