@@ -6,8 +6,8 @@
      named SASproject_groupX.sas. This code is expected to be between 300 and 400 lines.;
 
 * %let path = H:/ac 2019-2020/SC/SAS/project; /* path Thiebe */
-%let path = H:/SAS/HW/;  /* path Ondrej */
-* %let path = /folders/myfolders/Project/STATCOM_SASPROJECT/; /* path Jan */
+* %let path = H:/SAS/HW/;  /* path Ondrej */
+%let path = /folders/myfolders/Project/STATCOM_SASPROJECT/; /* path Jan */
 * %let path = H:/Statistical-Computing/SAS/Project/Data/;  /* path Emiel */
 * %let path = H:/ac 2019-2020/SC/SAS/project; /* libname Thiebe */
 
@@ -21,6 +21,7 @@ ods graphics / reset=all width=30cm height=20cm ; /* settings for graph, i hope 
 /* introduction */
 title 'Introduction';
 proc odstext;
+
 p 'Ever since the industrialization of the world and the enormous increase in the global human population it brought with it,
  pollution has increasingly become a problem. The rising industrial and energy production relied on the burning
  of fossil fuels and biomass to operate and made use of environmentally toxic chemicals that were released in the
@@ -28,7 +29,8 @@ p 'Ever since the industrialization of the world and the enormous increase in th
  increase in traffic only aggravated the air pollution problem. Realizing the problem, governments all over the world,
  both individually and together, vouched to create standards, start monitoring and increase air quality in, for example,
  the Clean Air Act (CAA) by the US, the Montreal Protocol by the United Nations,
- and the Convention on Long-range Transboundary Air Pollution (Air Convention) by the European Commission.';
+ and the Convention on Long-range Transboundary Air Pollution (Air Convention) by the European Commission.' /
+ style = [color=black fontsize=11pt];
 
 p 'According to the World Health Organisation (WHO), 9 out of 10 people breathe air containing high levels of pollutants and this
  air pollution kills an estimated seven million people worldwide every year. The causes of these premature deaths are strokes,
@@ -37,22 +39,27 @@ p 'According to the World Health Organisation (WHO), 9 out of 10 people breathe 
  These guidelines are based on expert evaluation of current scientific evidence for: particulate matter (PM), ozone (O3), nitrogen dioxide (NO2),
  sulphur dioxide (SO2) and carbon monoxide (CO). The Environmental Protection Agency (EPA) has developed an Air Quality Index (AQI) based on these pollutants.
  It is an index for reporting the daily air quality and is divided in six categories indicating levels of health concern,
- ranging from good (0-50) to hazardous (301 – 500) air quality conditions.';
+ ranging from good (0-50) to hazardous (301 ï¿½ 500) air quality conditions.'/ 
+ style = [color=black fontsize=11pt];
 
 p 'Ground-level ozone, not to be confused with atmospheric ozone, and airborne particulate matter pose the greatest threat to human health in the US.
  Ozone at ground level is one of the major constituents of photochemical smog. It is formed by the reaction with sunlight (photochemical reaction)
  of pollutants such as nitrogen oxides (NOx) and volatile organic compounds (VOCs) emitted by vehicles, solvents and industry. As a result, the highest
  levels of ozone pollution occur during periods of sunny weather. Excessive ozone in the air can have a marked effect on human health.
  It can cause breathing problems, trigger asthma, reduce lung function and cause lung diseases. 
- In this project we focus on the ozone levels in the state of Pennsylvania (PA) in the US between the years 2000 and 2016.';
-
-p 'Sources: 
-    • https://ec.europa.eu/environment/air/index_en.htm
-    • https://www.unece.org/env/lrtap/welcome.html.html
-    • https://www.epa.gov/laws-regulations/summary-clean-air-act
-    • https://www.unenvironment.org/ozonaction/who-we-are/about-montreal-protocol
-    • https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health
-    • https://airnow.gov/index.cfm?action=aqibasics.aqi';
+ In this project we focus on the ozone levels in the state of Pennsylvania (PA) in the US between the years 2000 and 2016.'/
+ style = [color=black fontsize=11pt];
+run;
+proc odstext;
+p 'Sources:' /  style = [color=black fontsize=11pt];
+list ;
+    item 'https://ec.europa.eu/environment/air/index_en.htm' /  style = [color=black fontsize=11pt];
+    item 'https://www.unece.org/env/lrtap/welcome.html.html' /  style = [color=black fontsize=11pt];
+    item 'https://www.epa.gov/laws-regulations/summary-clean-air-act' /  style = [color=black fontsize=11pt];
+    item 'https://www.unenvironment.org/ozonaction/who-we-are/about-montreal-protocol' /  style = [color=black fontsize=11pt];
+    item 'https://www.who.int/news-room/fact-sheets/detail/ambient-(outdoor)-air-quality-and-health' / style = [color=black fontsize=11pt];
+    item 'https://airnow.gov/index.cfm?action=aqibasics.aqi' /  style = [color=black fontsize=11pt];
+    end;
 run; /* i have no idea why this resetted the page */
 
 * Set libname (Proj);
@@ -76,7 +83,8 @@ FILENAME csv3 "&path.us-state-ansi-fips.csv" TERMSTR=LF;
 proc odstext;
 p 'The pollution data was obtained from https://www.kaggle.com/ksaulakh/r-analysis-pollution-data, 
  the climate data downloaded from https://www.ncdc.noaa.gov/ghcn/comparative-climatic-data and
- the data file us-state-ansi-fips.csv, further referred to as USstates, has provided the state names, state name FIPS codes (st) and postal abbreviations (stusps).';
+ the data file us-state-ansi-fips.csv, further referred to as USstates, has provided the state names, 
+ state name FIPS codes (st) and postal abbreviations (stusps).' /  style = [color=black fontsize=12pt];
 run;
 
 proc odstext;
@@ -178,9 +186,12 @@ ods select all;
 		county_code separated by an underscore. Search for a SAS function that can do this. ;
 
 proc odstext;
-p 'The monthly average temperatures for each state were merged with the USstates dataset containing additional details about each state.
- Subsequently, the results were merged with the pollution dataset. The Country_Code variable contained in the final result does not uniquely specify each county 
- - there exist different counties with the same code. However, within each state, the Country_Codes are unique. Thus an unique country identifier of the form StateCode_CountryCode was made.';
+p 'The monthly average temperatures for each state were merged with the USstates 
+dataset containing additional details about each state.
+ Subsequently, the results were merged with the pollution dataset. 
+ The Country_Code variable contained in the final result does not uniquely specify each county 
+ - there exist different counties with the same code. However, within each state, the Country_Codes are unique. 
+ Thus an unique country identifier of the form StateCode_CountryCode was made.'/  style = [color=black fontsize=12pt];
 run;
 
 ods select none;
@@ -244,7 +255,9 @@ run;
 run;*/
 
 proc odstext;
-p 'For further analysis, only the observations from Pennsylvania(PA) were considered. In the table below, the average values of O3_mean and O3_AQI are shown for each month and county.';
+p 'For further analysis, only the observations from Pennsylvania(PA) were considered. 
+In the table below, the average values of O3_mean and O3_AQI are shown for each month and county.'
+/  style = [color=black fontsize=12pt];
 run;
 
 *    8. Calculate average values of O3_mean and O3_AQI for each county and month and include the table in your report. 
@@ -263,10 +276,13 @@ run;
 title;
 
 proc odstext;
-p 'The results show that in the summer months for several counties even the mean O3_AQI is not in the good range (<50).';
+p 'The results show that in the summer months for several counties even the mean O3_AQI is not in the good range (<50).'/ 
+ style = [color=black fontsize=11pt];
 run;
 proc odstext;
-p 'The average concentrations of O3 by county are plotted, showing that he pollution is quite uniform over the counties(at least in the average).';
+p 'The average concentrations of O3 by county are plotted, showing that he pollution is quite uniform over the counties
+(at least in the average).'/ 
+ style = [color=black fontsize=11pt];
 run;
 
 *    9. Plot the average concentration of O3 in different counties, using barplots, in descending order. Use appropiate 
@@ -279,8 +295,10 @@ proc sgplot data=work.meansO3;
 run;
 
 proc odstext;
-p 'The yearly averages of O3 concentration are displayed in the following heatmap. The (O3 - related) air quality seems to be typically slightly improving
- - notably in Erie, York and Cambria.';
+p 'The yearly averages of O3 concentration are displayed in the following heatmap. 
+The (O3 - related) air quality seems to be typically slightly improving
+ - notably in Erie, York and Cambria.'/ 
+ style = [color=black fontsize=11pt];
 run;
 
 *    10. Calculate the yearly average of the ozone concentration for each county and output these values to a SAS data set. 
@@ -344,8 +362,9 @@ title;
 ideally the county names should have longer length (possible with lenght county $ desiredlength )*/
 
 proc odstext;
-p 'The Adams, Erie and Lancaste counties are the three counties with the highest average O3 concentration (see the barplot above). The O3_AQI over time there is plotted below.
- From the results, it seems that at least the maxima of O3 concentration are getting smaller.';
+p 'The Adams, Erie and Lancaste counties are the three counties with the highest average O3 concentration 
+(see the barplot above). The O3_AQI over time there is plotted below.
+ From the results, it seems that at least the maxima of O3 concentration are getting smaller.'/  style = [color=black fontsize=12pt];
 run;
 
 *    11. Using again the data set created in question 7, draw a lineplot that displays O3_AQI over the years for the 
@@ -383,7 +402,7 @@ it is in the course how to do this*/
 
 proc odstext;
 p 'The O3 concentration in the plot above shows a strong seasonal dependence. It is natural to ask whether it depends on the temperature.
- As the data from 2015 show, there is a positive correlation.';
+ As the data from 2015 show, there is a positive correlation.' /  style = [color=black fontsize=12pt];
 run;
 
 *    12. Subset the data: select the observations from the year 2015 and verify whether there is an association between 
