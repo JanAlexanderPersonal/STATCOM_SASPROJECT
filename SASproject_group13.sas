@@ -10,10 +10,10 @@ Emiel PLATJOUW
 * C004077A - Statistical computing : 2019 - 2020
 ***********************************************;
 
-* %let path = H:/ac 2019-2020/SC/SAS/project; /* path Thiebe */
+ %let path = H:/ac 2019-2020/SC/SAS/project; /* path Thiebe */
 * %let path = H:/SAS/HW/;  /* path Ondrej */
 * %let path = /folders/myfolders/Project/STATCOM_SASPROJECT/; /* path Jan */
- %let path = H:/Statistical-Computing/SAS/Project/Data/;  /* path Emiel */
+* %let path = H:/Statistical-Computing/SAS/Project/Data/;  /* path Emiel */
 
 * Set libname (Proj);
 libname Proj "&path";
@@ -41,7 +41,6 @@ proc means data=work.climate nway noprint;
 	output out = work.meanTemp (drop=_type_ _freq_ ) mean= / 
 	autoname;
 run;
-
 proc print data=work.meanTemp (obs=5) noobs;
 	format JAN_mean --  DEC_mean 6.2;
 run;
@@ -120,12 +119,12 @@ run;
 		Write down your findings. Remedy the problem by creating a unique county code by concatenating state_code and
 		county_code separated by an underscore. Search for a SAS function that can do this. ;
 
-*There's a different number of county codes and countys;
+* There's a different number of county codes and countys;
 proc freq data = work.pollutionTemp nlevels;
 	tables County County_Code / noprint;
 run;
 
-*However, state by state, the number is the same. The conclusion is that different states use the same county codes.;
+* However, state by state, the number is the same. The conclusion is that different states use the same county codes.;
 proc freq data = work.pollutionTemp nlevels;
 	tables County County_Code / noprint;
 	by State;
@@ -137,7 +136,7 @@ data work.pollutionTemp;
 run;
 proc print data=work.pollutionTemp (obs=15); run;
 
-/* Still some counties with multiple id's */ 
+* Still some counties with multiple id's;
 proc freq data = work.pollutionTemp nlevels;
 	tables County county_id / noprint;
 run;
@@ -163,7 +162,6 @@ run;
         ? O3_mean
         ? O3_AQI
         ? Temperature variable from question 3;
-
 data Proj.pollutionTemp(keep = County County_code State stusps st Date_Local month O3_Units O3_mean O3_AQI Temperature_Mean);
 	set work.pollutionTemp;
 	where stusps = 'PA';
@@ -184,16 +182,14 @@ options papersize=a4 orientation = portrait
                      rightmargin=1.5cm; 					
 ods pdf file = "&path.SASproject_group13.pdf" startpage=never style=sasweb notoc;  
 ods graphics / reset=all width=16cm height=10cm ;
+
 /* introduction */
 title;
 proc odstext;
-
 p 'Project Statistical computing' /
  style = [color=black fontsize=16pt];
- 
 p 'Group 13' /
  style = [color=grey fontsize=14pt]; 
- 
 run;
 
 data work.team;
@@ -216,7 +212,6 @@ ods proclabel 'Introduction';
 proc odstext;
 p 'Introduction' /
  style = [color=grey fontsize=14pt]; 
-
 p 'Ever since the industrialization of the world and the enormous increase in the global human population,
  pollution has increasingly become a problem. The rising industrial- and energy production relied on the burning
  of fossil fuels and biomass to operate, and made use of environmentally toxic chemicals. These chemicals were released in the
@@ -226,7 +221,6 @@ p 'Ever since the industrialization of the world and the enormous increase in th
  the Clean Air Act (CAA) by the US, the Montreal Protocol by the United Nations,
  and the Convention on Long-range Transboundary Air Pollution (Air Convention) by the European Commission.' /
  style = [color=black fontsize=9pt];
-
 p 'According to the World Health Organisation (WHO), 9 out of 10 people breathe air containing high levels of pollutants. This
  air pollution kills an estimated seven million people worldwide, every year. The causes of these deaths are strokes,
  hearth diseases, lung cancer and both chronic and acute respiratory diseases. The WHO offers global guidance on thresholds and
@@ -236,7 +230,6 @@ p 'According to the World Health Organisation (WHO), 9 out of 10 people breathe 
  It is an index for reporting the daily air quality and is divided in six categories indicating levels of health concern,
  ranging from good (0-50) to hazardous (301 - 500) air quality conditions.'/ 
  style = [color=black fontsize=9pt];
-
 p 'Ground-level ozone, not to be confused with atmospheric ozone, and airborne particulate matter pose the greatest threat to human health in the US.
  Ozone at ground level is one of the major constituents of photochemical smog. It is formed by the photochemical reaction of sunlight
  with pollutants such as nitrogen oxides (NOx) and volatile organic compounds (VOCs) emitted by vehicles, solvents and industry. As a result, the highest
@@ -245,8 +238,6 @@ p 'Ground-level ozone, not to be confused with atmospheric ozone, and airborne p
  In this project we evaluate the ozone levels and Air Quality Index (AQI) in the state of Pennsylvania (PA) in the US between the years 2000 and 2016.'/
  style = [color=black fontsize=9pt];
 run;
-
-
 proc odstext;
 p 'Sources:' /  style = [color=black fontsize=11pt];
 list ;
@@ -258,124 +249,22 @@ list ;
     item 'https://airnow.gov/index.cfm?action=aqibasics.aqi' /  style = [color=black fontsize=9pt];
     end;
 run; 
-
 proc odstext;
 p 'Data sources' /
  style = [color=grey fontsize=14pt]; 
- 
 p 'The pollution data was obtained from https://www.kaggle.com/ksaulakh/r-analysis-pollution-data, 
  the climate data downloaded from https://www.ncdc.noaa.gov/ghcn/comparative-climatic-data and
  the data file us-state-ansi-fips.csv, further referred to as USstates, has provided the state names, 
  state name FIPS codes (st) and postal abbreviations (stusps).' /  style = [color=black fontsize=9pt];
 run;
 
-*    2. Using the climate data, calculate the mean temperature value in each state and month and output the results. ;
-ods select none;
-proc odstext;
-p 'Climate data analysis' /
- style = [color=grey fontsize=14pt]; 
- 
-p 'Using the climate data, the mean temperature in each month was computed for every state. 
-The results for the (alphabetically) first 5 states are shown in the following table.' /  
-style = [color=black fontsize=9pt];
-run;
-title 'Average temperature per month in each state';
-proc means data=work.climate nway noprint;
-	var JAN -- DEC;
-	class state_postal_abbr;
-	output out = work.meanTemp (drop=_type_ _freq_ ) mean= / 
-	autoname;
-run;
-proc print data=work.meanTemp (obs=5) noobs;
-	format JAN_mean --  DEC_mean 6.2;
-run;
-title;
-ods select all;
-
-ods select none;
-*    6. Use an appropiate procedure for comparing the number of levels of county_code and county. What do you observe? 
-		Write down your findings. Remedy the problem by creating a unique county code by concatenating state_code and
-		county_code separated by an underscore. Search for a SAS function that can do this. ;
-
-proc odstext;
-p 'The monthly average temperatures for each state were merged with the USstates 
-dataset containing additional details about each state.
- Subsequently, the results were merged with the pollution dataset. 
- The Country_Code variable contained in the final result does not uniquely specify each county 
- - there exist different counties with the same code. However, within each state, the Country_Codes are unique. 
- Thus an unique country identifier of the form StateCode_CountryCode was made.'/  style = [color=black fontsize=9pt];
-run;
-
-*There's a different number of county codes and countys;
-proc freq data = work.pollutionTemp nlevels;
-	tables County County_Code / noprint;
-run;
-
-
-*However, state by state, the number is the same. The conclusion is that different states use the same county codes.;
-proc freq data = work.pollutionTemp nlevels;
-	tables County County_Code / noprint;
-	by State;
-run;
-data work.pollutionTemp;
-	set work.pollutionTemp;
-	county_id = catx('_', State_Code, County_Code);
-run;
-proc print data=work.pollutionTemp (obs=15); run;
-
-/* Thiebe: Did this for checking, although it's better, now we seemingly have too much county_id's*/
-proc freq data = work.pollutionTemp nlevels;
-	tables County county_id / noprint;
-run;
-/* Still some counties with multiple id's */ 
-proc sql;
-	select * from
-		(select *, count(County) as count
-			from (select distinct State, County, county_id
-				from work.pollutionTemp)
-		group by County)
-	where count > 1;
-run;
-ods select all;
-
-ods select none;
-*    7. Using the data set obtained from question 6, create a permanent data set keeping all observations from the state 
-		PA and the variables
-        ? County
-        ? County_Code
-        ? Stname
-        ? Stusps
-        ? St
-        ? Date_Local
-        ? Month variable from question 5
-        ? O3_units
-        ? O3_mean
-        ? O3_AQI
-        ? Temperature variable from question 3;
-
-data Proj.pollutionTemp(keep = County County_code State stusps st Date_Local month O3_Units O3_mean O3_AQI Temperature_Mean);
-	set work.pollutionTemp;
-	where stusps = 'PA';
-run;
-/*proc print data=Proj.pollutionTemp (obs=15); 
-	format month mnthfmt.;
-run;*/
-
-proc odstext;
-p 'For further analysis, only the observations from Pennsylvania(PA) were considered. 
-In the table below, the average values of O3_mean and O3_AQI are shown for each month and county.'
-/  style = [color=black fontsize=9pt];
-run;
-ods select all;
 *    8. Calculate average values of O3_mean and O3_AQI for each county and month and include the table in your report. 
 		Use the tabulate procedure. Make use of the Date_local variable in combination with an appropiate format. 
 		Report 3 decimals. Discuss.;
 options orientation=landscape;
-
 proc format;
 	value fiftyplus 50-100 = 'Orange';
 run;
-
 title 'Monthly averages of O3 data for each county';
 proc tabulate data=Proj.pollutionTemp format = 8.3 out = work.meansO3 ;
 	class County Date_Local;
@@ -385,7 +274,6 @@ proc tabulate data=Proj.pollutionTemp format = 8.3 out = work.meansO3 ;
 	table County=' ', Date_Local=' '*(O3_AQI=' '*{style={backgroundcolor = fiftyplus.}})*(mean=' ') / rts=25 row=float box="Mean AQI";
 	label Date_Local = 'Month';
 	format Date_Local MONNAME12.;
-
 run;
 title;
 options orientation=portrait;
@@ -404,8 +292,8 @@ proc sgplot data=work.meansO3 NOAUTOLEGEND;
 	yaxis label = 'Average Concentration O3';
 run;
 proc odstext;
-p 'The average concentrations (with the standard deviation) of ozon (03) by county can be seen above. Most counties are quite comparable in ozon concentration.
- Adamsis highest in ozon concentration, while Philadelphia is far below average.'/ 
+p 'The average concentrations (with the standard deviations) of ozon (03) by county can be seen above. Most counties are quite comparable in ozon concentration.
+ Adams is the highest in ozon concentration, while Philadelphia is far below average.'/ 
  style = [color=black fontsize=9pt];
 run;
 
@@ -430,7 +318,6 @@ ods select all;
 proc sort data = work.yearmeans03;
 	by Date_Local O3_Mean_Mean;
 run;
-
 title "Continuous Heat Map";
 title2 "Mean O3 concentration per county per year";
 proc sgplot data=work.yearmeans03;
@@ -485,6 +372,7 @@ proc odstext;
 p 'The ozon related Air Quality Index (03_AQI) in the plot above shows a strong seasonal dependence.
  It is natural to investigate whether it depends on temperature.' /  style = [color=black fontsize=9pt];
 run;
+ods startpage=now;
 
 *    12. Subset the data: select the observations from the year 2015 and verify whether there is an association between 
 		temperature and O3_AQI. Report and discuss your findings.;
@@ -506,6 +394,7 @@ proc sgplot data=Proj.pollutionTemp2015;
 run;
 ods select none;
 ods trace on;
+ods noproctitle;
 ods select PearsonCorr;
 proc corr data=Proj.pollutionTemp20152 ;
    var AQI;
