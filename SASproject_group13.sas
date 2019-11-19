@@ -10,10 +10,10 @@ Emiel PLATJOUW
 * C004077A - Statistical computing : 2019 - 2020
 ***********************************************;
 
-%let path = H:/ac 2019-2020/SC/SAS/project; /* path Thiebe */
+* %let path = H:/ac 2019-2020/SC/SAS/project; /* path Thiebe */
 * %let path = H:/SAS/HW/;  /* path Ondrej */
 * %let path = /folders/myfolders/Project/STATCOM_SASPROJECT/; /* path Jan */
-* %let path = H:/Statistical-Computing/SAS/Project/Data/;  /* path Emiel */
+ %let path = H:/Statistical-Computing/SAS/Project/Data/;  /* path Emiel */
 
 * Set libname (Proj);
 libname Proj "&path";
@@ -234,7 +234,7 @@ p 'According to the World Health Organisation (WHO), 9 out of 10 people breathe 
  These guidelines are based on expert evaluation of current scientific evidence for: particulate matter (PM), ozone (O3), nitrogen dioxide (NO2),
  sulphur dioxide (SO2) and carbon monoxide (CO). The Environmental Protection Agency (EPA) has developed an Air Quality Index (AQI) based on these pollutants.
  It is an index for reporting the daily air quality and is divided in six categories indicating levels of health concern,
- ranging from good (0-50) to hazardous (301 ? 500) air quality conditions.'/ 
+ ranging from good (0-50) to hazardous (301 - 500) air quality conditions.'/ 
  style = [color=black fontsize=9pt];
 
 p 'Ground-level ozone, not to be confused with atmospheric ozone, and airborne particulate matter pose the greatest threat to human health in the US.
@@ -370,24 +370,27 @@ ods select all;
 *    8. Calculate average values of O3_mean and O3_AQI for each county and month and include the table in your report. 
 		Use the tabulate procedure. Make use of the Date_local variable in combination with an appropiate format. 
 		Report 3 decimals. Discuss.;
-	** Version with tabulate, proper format and use of Date_Local and the saved pollutionTemp data ;
-	** Missing months still present but just not there in the original data maybe?;
-	
+options orientation=landscape;
+
+proc format;
+	value fiftyplus 50-100 = 'Orange';
+run;
+
 title 'Monthly averages of O3 data for each county';
 proc tabulate data=Proj.pollutionTemp format = 8.3 out = work.meansO3 ;
 	class County Date_Local;
 	var O3_Mean O3_AQI;
-	*table County, Date_Local*(O3_Mean*mean O3_AQI*mean);
-	table County, Date_Local*(O3_Mean=' ')*(mean=' ') / rts=25 row=float box="O3_mean";
-	table County, Date_Local*(O3_AQI=' ')*(mean=' ') / rts=25 row=float box="O3_AQI";
+	*table County=' ', Date_Local=' '*(O3_Mean='Conc'*mean=' ' O3_AQI='AQI'*mean=' ');
+	table County=' ', Date_Local=' '*(O3_Mean=' ')*(mean=' ') / rts=25 row=float box="Mean Concentration";
+	table County=' ', Date_Local=' '*(O3_AQI=' '*{style={backgroundcolor = fiftyplus.}})*(mean=' ') / rts=25 row=float box="Mean AQI";
 	label Date_Local = 'Month';
-	format Date_Local MONNAME3.;
+	format Date_Local MONNAME12.;
 
 run;
 title;
-
+options orientation=portrait;
 proc odstext;
-p 'The tables above show that in the summer months for several counties the average ozon Air Quality Index (03_AQI) is larger than 50, 
+p 'The tables above show that in the summer months for several counties the average ozon Air Quality Index (03_AQI) is larger than 50 (orange), 
  which is beyond the "good" limit.'/ 
  style = [color=black fontsize=9pt];
 run;
@@ -412,7 +415,7 @@ run;
 		ozone concentration as response. You might want to have a look at the SAS blog from Rick Wicklin 
 		https://blogs.sas.com/content/iml/2019/07/15/create-discrete-heat-map-sgplot.html. 
 		Include the heatmap in your report and discuss.;
-	
+ods graphics / reset=all;
 title 'Yearly average O3 concentration for each county';
 ods select none;
 proc tabulate data=Proj.pollutionTemp format=8.3 out=work.yearmeans03;
@@ -428,7 +431,7 @@ proc sort data = work.yearmeans03;
 	by Date_Local O3_Mean_Mean;
 run;
 
-title "Continuous Heat Map option 2";
+title "Continuous Heat Map";
 title2 "Mean O3 concentration per county per year";
 proc sgplot data=work.yearmeans03;
 	heatmapparm x=Date_Local y=County colorresponse=O3_Mean_Mean / 
@@ -444,7 +447,7 @@ The ozon concentration (03) seems to be slightly improving overall
  - noticable in Erie, York and Cambria. In Philadelphia the oozon concentration (03) is noticeably increasing.'/ 
  style = [color=black fontsize=9pt];
 run;
-
+ods graphics / reset=all width=16cm height=10cm ;
 *    11. Using again the data set created in question 7, draw a lineplot that displays O3_AQI over the years for the 
 		3 counties with highest concentration as concluded from question 9. When plotting, take monthly mean values 
 		as the representative values by using an appropiate format for Date_local. The Y-axis limits should be 0 and 220. 
@@ -485,7 +488,7 @@ run;
 
 *    12. Subset the data: select the observations from the year 2015 and verify whether there is an association between 
 		temperature and O3_AQI. Report and discuss your findings.;
-title "association between temperature and O3_AQI";
+title "Association between Temperature and O3 Air Quality Index";
 ods select none;
 proc sql;
 create table Proj.pollutionTemp2015 as
